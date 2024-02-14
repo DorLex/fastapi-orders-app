@@ -1,12 +1,14 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from src.accounts import schemas, models
+from src.accounts.models import User
+from src.accounts.schemas import UserCreate
 from src.accounts.utils.auth import get_password_hash
 
 
-def create_user(db: Session, user: schemas.UserCreate):
+def create_user(db: Session, user: UserCreate):
     hashed_password = get_password_hash(user.password)
-    db_user = models.User(
+    db_user = User(
         username=user.username,
         hashed_password=hashed_password
     )
@@ -19,12 +21,16 @@ def create_user(db: Session, user: schemas.UserCreate):
 
 
 def get_user_by_id(db: Session, user_id: int):
-    return db.query(models.User).filter(models.User.id == user_id).first()
+    return db.query(User).filter(User.id == user_id).first()
 
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
+    return db.query(User).filter(User.username == username).first()
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.User).offset(skip).limit(limit).all()
+    # return db.query(User).offset(skip).limit(limit).all()
+
+    stmt = select(User).offset(skip).limit(limit)
+
+    return db.scalars(stmt).all()
