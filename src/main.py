@@ -1,10 +1,14 @@
 from fastapi import FastAPI
 
 from src import exceptions
+from src.accounts import models
 from src.accounts.routers import users, auth
 from src.accounts.routers import registration
+from src.database import engine
 
 from src.orders.routers import orders
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title='Orders App',

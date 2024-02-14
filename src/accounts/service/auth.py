@@ -3,15 +3,16 @@ from typing import Annotated
 
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
+from sqlalchemy.orm import Session
 from starlette import status
 
 from src.accounts.config import SECRET_KEY, ALGORITHM
 from src.accounts.schemas.token import TokenData
 from src.accounts.schemas.user import UserInDB
-from src.accounts.service.db import get_user_from_db
+from src.accounts.service.crud import get_user_by_username
 from src.accounts.utils.auth import verify_password
-from src.database import fake_users_db
 from src.accounts.dependencies import oauth2_scheme
+from src.dependencies import get_db
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
@@ -25,8 +26,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user: UserInDB = get_user_from_db(fake_db, username)
+def authenticate_user(db: Session, username: str, password: str):
+    user: UserInDB = get_user_by_username(db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -34,7 +35,10 @@ def authenticate_user(fake_db, username: str, password: str):
     return user
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+        token: Annotated[str, Depends(oauth2_scheme)],
+        db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail='Could not validate credentials',
@@ -50,7 +54,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except JWTError:
         raise credentials_exception
 
-    user = get_user_from_db(fake_users_db, username=token_data.username)
+    user = get_user_by_username(db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

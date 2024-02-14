@@ -1,14 +1,16 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.orm import Session
 from starlette import status
 
+from src.accounts.schemas import UserCreate
 from src.accounts.service.auth import authenticate_user, create_access_token
 from src.accounts.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from src.accounts.schemas.token import Token
-from src.database import fake_users_db
+from src.dependencies import get_db
 
 router = APIRouter(
     prefix='/auth',
@@ -17,10 +19,13 @@ router = APIRouter(
 
 
 @router.post('/token/')
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> Token:
-    # async def login_for_access_token(form_data: Annotated[UserIn, Body()]) -> Token:
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
-    
+async def login_for_access_token(
+        form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+        # form_data: Annotated[UserCreate, Body()],
+        db: Session = Depends(get_db)
+) -> Token:
+    user = authenticate_user(db, form_data.username, form_data.password)
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
