@@ -7,7 +7,8 @@ from starlette import status
 
 from src.accounts.config import SECRET_KEY, ALGORITHM
 from src.accounts.schemas.token import TokenData
-from src.accounts.service.db import get_user
+from src.accounts.schemas.user import UserInDB
+from src.accounts.service.db import get_user_from_db
 from src.accounts.utils.auth import verify_password
 from src.database import fake_users_db
 from src.accounts.dependencies import oauth2_scheme
@@ -25,7 +26,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 
 def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+    user: UserInDB = get_user_from_db(fake_db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -49,7 +50,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     except JWTError:
         raise credentials_exception
 
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user_from_db(fake_users_db, username=token_data.username)
     if user is None:
         raise credentials_exception
     return user

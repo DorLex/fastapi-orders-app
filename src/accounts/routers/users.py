@@ -19,4 +19,4 @@ async def read_users_me(current_user: Annotated[UserBase, Depends(get_current_us
 
 @router.get('/me/items/')
 async def read_own_items(current_user: Annotated[UserBase, Depends(get_current_user)]):
-    return [{"item_id": "Foo", "owner": current_user.username}]
+    return [{'item_id': 'Foo', 'owner': current_user.username}]
