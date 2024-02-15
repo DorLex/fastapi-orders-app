@@ -13,11 +13,12 @@ class Order(Base):
 
     status: Mapped[str] = mapped_column(
         Enum(OrderStatusEnum),
-        default=OrderStatusEnum.in_processing.value
+        default=OrderStatusEnum.in_processing
     )
 
-    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
+    description: Mapped[str] = mapped_column(String)
 
+    owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
     owner: Mapped['User'] = relationship(back_populates='orders')
 
     def __repr__(self) -> str:

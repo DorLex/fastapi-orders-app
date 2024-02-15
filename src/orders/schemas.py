@@ -1,8 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class OrderBase(BaseModel):
     title: str
+    description: str
 
 
 class OrderIn(OrderBase):
@@ -12,3 +13,4 @@ class OrderIn(OrderBase):
 class OrderOut(OrderBase):
     id: int
     status: str
+    owner_id: int

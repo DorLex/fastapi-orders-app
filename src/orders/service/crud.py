@@ -5,10 +5,11 @@ from src.orders.models import Order
 from src.orders.schemas import OrderIn
 
 
-def create_order(db: Session, order: OrderIn):
+def create_order(db: Session, user_id: int, order: OrderIn):
     db_order = Order(
         title=order.title,
-        status=order.status
+        description=order.description,
+        owner_id=user_id
     )
 
     db.add(db_order)
