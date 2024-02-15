@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from src.database import Base
@@ -12,10 +12,10 @@ class User(Base):
 
     hashed_password: Mapped[str] = mapped_column(String)
 
-    # orders: Mapped[list['Order']] = relationship(
-    #     back_populates='owner',
-    #     cascade='all, delete-orphan'
-    # )
+    orders: Mapped[list['Order']] = relationship(
+        back_populates='owner',
+        cascade='all, delete-orphan'
+    )
 
     def __repr__(self) -> str:
         return f'User(id={self.id!r}, username={self.username!r})'

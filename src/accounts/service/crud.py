@@ -21,16 +21,15 @@ def create_user(db: Session, user: UserCreate):
 
 
 def get_user_by_id(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
+    stmt = select(User).where(User.id == user_id)
+    return db.scalar(stmt)
 
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+    stmt = select(User).where(User.username == username)
+    return db.scalar(stmt)
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
-    # return db.query(User).offset(skip).limit(limit).all()
-
     stmt = select(User).offset(skip).limit(limit)
-
     return db.scalars(stmt).all()
