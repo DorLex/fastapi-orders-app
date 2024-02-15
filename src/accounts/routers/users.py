@@ -1,9 +1,7 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from src.accounts.service.auth import get_current_user
+from src.accounts.service.auth import get_current_user, verify_token
 
 from src.accounts.schemas.user import User
 from src.accounts.service.crud import get_users
@@ -11,7 +9,8 @@ from src.dependencies import get_db
 
 router = APIRouter(
     prefix='/users',
-    tags=['users']
+    tags=['users'],
+    dependencies=[Depends(verify_token)]
 )
 
 
@@ -22,10 +21,5 @@ async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_
 
 
 @router.get('/me/', response_model=User)
-async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
+async def read_users_me(current_user: User = Depends(get_current_user)):
     return current_user
-
-
-@router.get('/me/items/')
-async def read_own_items(current_user: Annotated[User, Depends(get_current_user)]):
-    return [{'item_id': 'Foo', 'owner': current_user.username}]

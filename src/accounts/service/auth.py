@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
@@ -17,8 +15,8 @@ from src.dependencies import get_db
 def create_access_token(username: str):
     token_expire = generate_token_expire(ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    to_encode = {'sub': username, 'exp': token_expire}
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    payload = {'username': username, 'exp': token_expire}
+    encoded_jwt = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
 
     return encoded_jwt
 
@@ -32,26 +30,25 @@ def authenticate_user(db: Session, username: str, password: str):
     return user
 
 
-async def get_current_user(
-        token: Annotated[str, Depends(oauth2_scheme)],
-        db: Session = Depends(get_db)
-):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail='Could not validate credentials',
-        headers={'WWW-Authenticate': 'Bearer'},
-    )
+def verify_token(token: str = Depends(oauth2_scheme)):
+    invalid_token_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get('sub')
+        username: str = payload.get('username')
         if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
+            raise invalid_token_exception
 
+        token_data = TokenData(username=username)
+
+    except JWTError:
+        raise invalid_token_exception
+
+    return token_data
+
+
+def get_current_user(token_data: TokenData = Depends(verify_token), db: Session = Depends(get_db)):
     user = get_user_by_username(db, username=token_data.username)
     if user is None:
-        raise credentials_exception
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
     return user
