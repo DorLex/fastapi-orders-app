@@ -1,4 +1,5 @@
-from sqlalchemy import String, ForeignKey, Enum
+from sqlalchemy import String, ForeignKey
+from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from src.database import Base
@@ -12,7 +13,7 @@ class Order(Base):
     title: Mapped[str] = mapped_column(String(100))
 
     status: Mapped[str] = mapped_column(
-        Enum(OrderStatusEnum),
+        ENUM(OrderStatusEnum),
         default=OrderStatusEnum.in_processing
     )
 
