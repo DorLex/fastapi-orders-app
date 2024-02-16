@@ -1,9 +1,9 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends
 from jose import jwt, JWTError
 from sqlalchemy.orm import Session
-from starlette import status
 
 from src.accounts.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from src.accounts.exceptions import InvalidTokenException, CredentialsException
 from src.accounts.schemas.token import TokenData
 from src.accounts.schemas.user import UserInDB
 from src.accounts.service.crud import get_user_by_username
@@ -31,18 +31,16 @@ def authenticate_user(db: Session, username: str, password: str):
 
 
 def verify_token(token: str = Depends(oauth2_scheme)):
-    invalid_token_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Invalid token')
-
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get('username')
         if username is None:
-            raise invalid_token_exception
+            raise InvalidTokenException
 
         token_data = TokenData(username=username)
 
     except JWTError:
-        raise invalid_token_exception
+        raise InvalidTokenException
 
     return token_data
 
@@ -50,5 +48,5 @@ def verify_token(token: str = Depends(oauth2_scheme)):
 def get_current_user(token_data: TokenData = Depends(verify_token), db: Session = Depends(get_db)):
     user = get_user_by_username(db, username=token_data.username)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='Could not validate credentials')
+        raise CredentialsException
     return user

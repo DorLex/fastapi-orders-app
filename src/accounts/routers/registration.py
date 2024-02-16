@@ -20,4 +20,4 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail='username already registered')
 
-    return create_user(db=db, user=user)
+    return create_user(db, user)

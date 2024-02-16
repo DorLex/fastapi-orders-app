@@ -21,6 +21,8 @@ async def login_for_access_token(
         # form_data: Annotated[UserCreate, Body()],
         db: Session = Depends(get_db)
 ) -> Token:
+    """Авторизация"""
+
     user = authenticate_user(db, form_data.username, form_data.password)
 
     if not user:
