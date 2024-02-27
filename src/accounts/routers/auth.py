@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 
 from src.accounts.service.auth import authenticate_user, create_access_token
-from src.accounts.schemas.token import Token
+from src.accounts.schemas.token import TokenSchema
 from src.dependencies import get_db
 
 router = APIRouter(
@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post('/token/', response_model=Token)
+@router.post('/token/', response_model=TokenSchema)
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         # form_data: Annotated[UserCreate, Body()],
@@ -34,4 +34,4 @@ async def login_for_access_token(
 
     access_token = create_access_token(user.username)
 
-    return Token(access_token=access_token, token_type='bearer')
+    return TokenSchema(access_token=access_token, token_type='bearer')

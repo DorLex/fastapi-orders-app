@@ -1,16 +1,16 @@
 from pydantic import BaseModel
 
 
-class OrderBase(BaseModel):
+class OrderBaseSchema(BaseModel):
     title: str
     description: str
 
 
-class OrderIn(OrderBase):
+class OrderInSchema(OrderBaseSchema):
     pass
 
 
-class OrderOut(OrderBase):
+class OrderOutSchema(OrderBaseSchema):
     id: int
     status: str
     owner_id: int

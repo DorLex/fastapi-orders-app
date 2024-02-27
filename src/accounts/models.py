@@ -4,7 +4,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from src.database import Base
 
 
-class User(Base):
+class UserModel(Base):
     __tablename__ = 'users'
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -12,7 +12,7 @@ class User(Base):
 
     hashed_password: Mapped[str] = mapped_column(String)
 
-    orders: Mapped[list['Order']] = relationship(
+    orders: Mapped[list['OrderModel']] = relationship(
         back_populates='owner',
         cascade='all, delete-orphan'
     )

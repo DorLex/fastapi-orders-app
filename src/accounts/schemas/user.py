@@ -1,11 +1,11 @@
 from pydantic import BaseModel
 
 
-class UserBase(BaseModel):
+class UserBaseSchema(BaseModel):
     username: str
 
 
-class UserCreate(UserBase):
+class UserCreateSchema(UserBaseSchema):
     password: str
 
     model_config = {
@@ -20,11 +20,11 @@ class UserCreate(UserBase):
     }
 
 
-class UserInDB(UserBase):
+class UserInDBSchema(UserBaseSchema):
     hashed_password: str
 
 
-class User(UserBase):
+class UserSchema(UserBaseSchema):
     id: int
 
     class Config:
