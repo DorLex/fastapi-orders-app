@@ -20,7 +20,14 @@ def create_order(db: Session, user: UserModel, order: OrderInSchema):
     return db_order
 
 
-# def update_order(db: Session, order: OrderIn):
+def update_order_status(db: Session, db_order: OrderModel, status: str):
+    db_order.status = status
+
+    db.add(db_order)
+    db.commit()
+    db.refresh(db_order)
+
+    return db_order
 
 
 def get_all_orders(db: Session, skip: int = 0, limit: int = 100):
