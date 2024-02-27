@@ -15,12 +15,12 @@ router = APIRouter(
 )
 
 
-@router.post('/token/')
+@router.post('/token/', response_model=Token)
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         # form_data: Annotated[UserCreate, Body()],
         db: Session = Depends(get_db)
-) -> Token:
+):
     """Авторизация"""
 
     user = authenticate_user(db, form_data.username, form_data.password)

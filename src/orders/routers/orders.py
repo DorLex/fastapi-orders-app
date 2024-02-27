@@ -22,12 +22,12 @@ async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return orders
 
 
-@router.post('/')
+@router.post('/', response_model=OrderOut)
 async def add_order(
         order: OrderIn,
         db: Session = Depends(get_db),
         current_user: User = Depends(get_current_user)
-) -> OrderOut:
+):
     """Добавить заказ"""
 
     return create_order(db, current_user, order)
