@@ -1,7 +1,7 @@
 from src.kafka_service.consumer.consumer import consumer
 
-if __name__ == '__main__':
 
+def run_consumer():
     for message in consumer:
         print(
             'Consumer:',

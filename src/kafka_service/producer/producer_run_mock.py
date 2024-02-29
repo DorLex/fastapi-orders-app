@@ -18,5 +18,5 @@ if __name__ == '__main__':
         sleep(2)
         user_id += 1
 
-# docker compose exec app python -m src.kafka_service.producer.producer_run
-# docker compose exec app python -m src.kafka_service.consumer.consumer_run
+# docker compose exec app python -m src.kafka_service.producer.producer_run_mock
+# docker compose exec app python -m src.run_consumer
