@@ -1,8 +1,9 @@
 import json
-
 from time import sleep
 
 from kafka import KafkaProducer
+
+from src.kafka_service.config import KAFKA_BOOTSTRAP_SERVERS
 
 
 def serializer(mess):
@@ -10,7 +11,7 @@ def serializer(mess):
 
 
 producer = KafkaProducer(
-    bootstrap_servers=['localhost:9092'],
+    bootstrap_servers=[KAFKA_BOOTSTRAP_SERVERS],
     value_serializer=serializer
 )
 
@@ -24,12 +25,11 @@ if __name__ == '__main__':
             'message': str(user_id) * 10
         }
 
-        # Send it to our 'messages' topic
         producer.send('messages', message)
-        print(f'Сообщение = {message}')
+        print(f'Producer: Сообщение = {message}')
 
         sleep(2)
         user_id += 1
 
-# kafka-topics.sh --bootstrap-server=localhost:9092 --list
-# kafka-topics.sh --create --topic messages --bootstrap-server localhost:9092
+# docker compose exec app python -m src.kafka_service.producer.producer
+# docker compose exec app python -m src.kafka_service.consumer.consumer
