@@ -7,6 +7,5 @@ consumer = KafkaConsumer(
     'messages',
     # group_id='my-group',
     bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-    # auto_offset_reset='earliest',
     value_deserializer=deserializer
 )
