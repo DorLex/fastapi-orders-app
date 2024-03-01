@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from src.accounts.models import UserModel
 from src.accounts.service.auth import get_current_user, verify_token
 from src.dependencies import get_db
+from src.kafka_service.producer.producer import producer
+from src.orders.models import OrderModel
 from src.orders.schemas import OrderInSchema, OrderOutSchema
 from src.orders.service.crud import create_order, get_all_orders, get_user_orders
-from src.orders.service.order_processing import order_processing
 
 router = APIRouter(
     prefix='/orders',
@@ -26,16 +27,17 @@ async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get
 @router.post('/', response_model=dict)
 async def add_order(
         order: OrderInSchema,
-        background_tasks: BackgroundTasks,
         db: Session = Depends(get_db),
         current_user: UserModel = Depends(get_current_user)
 ):
     """Добавить заказ"""
 
-    order = create_order(db, current_user, order)
-    background_tasks.add_task(order_processing, db=db, order=order)
+    db_order: OrderModel = create_order(db, current_user, order)
 
-    return {'message': f'Заказ {order.title} принят на обработку'}
+    message = {'order_id': db_order.id}
+    producer.send('orders', message)
+
+    return {'message': f'Заказ {db_order.title} №{db_order.id} принят на обработку'}
 
 
 @router.get('/my/', response_model=list[OrderOutSchema])

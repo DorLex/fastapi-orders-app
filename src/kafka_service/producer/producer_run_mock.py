@@ -4,19 +4,16 @@ from src.kafka_service.producer.producer import producer
 
 if __name__ == '__main__':
 
-    user_id = 1
+    order_id = 9999
 
     while True:
-        message = {
-            'user_id': user_id,
-            'message': str(user_id) * 10
-        }
+        message = {'order_id': order_id}
 
-        producer.send('messages', message)
+        producer.send('orders', message)
         print(f'Producer: Сообщение = {message}')
 
         sleep(2)
-        user_id += 1
+        order_id += 1
 
 # docker compose exec app python -m src.kafka_service.producer.producer_run_mock
 # docker compose exec app python -m src.run_consumer

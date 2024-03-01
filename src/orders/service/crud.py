@@ -1,12 +1,13 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
 from src.accounts.models import UserModel
+from src.database import SessionLocal
 from src.orders.models import OrderModel
 from src.orders.schemas import OrderInSchema
 
 
-def create_order(db: Session, user: UserModel, order: OrderInSchema):
+def create_order(db: Session, user: UserModel, order: OrderInSchema) -> OrderModel:
     db_order = OrderModel(
         title=order.title,
         description=order.description,
@@ -20,14 +21,12 @@ def create_order(db: Session, user: UserModel, order: OrderInSchema):
     return db_order
 
 
-def update_order_status(db: Session, db_order: OrderModel, status: str):
-    db_order.status = status
+def update_order_status(order_id: int, status: str):
+    stmt = update(OrderModel).values(status=status).where(OrderModel.id == order_id)
 
-    db.add(db_order)
-    db.commit()
-    db.refresh(db_order)
-
-    return db_order
+    with SessionLocal() as db:
+        db.execute(stmt)
+        db.commit()
 
 
 def get_all_orders(db: Session, skip: int = 0, limit: int = 100):
