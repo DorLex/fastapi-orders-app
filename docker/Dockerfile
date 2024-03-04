@@ -9,10 +9,10 @@ RUN python -m pip install -U pip &&  \
 
 WORKDIR /project
 
-COPY poetry.lock pyproject.toml ./
+COPY ../poetry.lock ../pyproject.toml ./
 
 RUN poetry install
 
-COPY . .
+COPY ../ ./
 
 EXPOSE 8000
