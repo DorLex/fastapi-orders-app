@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 
-load_dotenv()
+from src.config import DOTENV_PATH
+
+load_dotenv(DOTENV_PATH)
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
