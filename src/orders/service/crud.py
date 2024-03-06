@@ -1,8 +1,8 @@
-from sqlalchemy import select, update
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.accounts.models import UserModel
-from src.database import SessionLocal
+from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.schemas import OrderInSchema
 
@@ -21,12 +21,20 @@ def create_order(db: Session, user: UserModel, order: OrderInSchema) -> OrderMod
     return db_order
 
 
-def update_order_status(order_id: int, status: str):
-    stmt = update(OrderModel).values(status=status).where(OrderModel.id == order_id)
+def get_order_by_id(db: Session, order_id: int) -> OrderModel:
+    stmt = select(OrderModel).where(OrderModel.id == order_id)
+    return db.scalar(stmt)
 
-    with SessionLocal() as db:
-        db.execute(stmt)
-        db.commit()
+
+def update_order_status(db: Session, db_order: OrderModel, status: OrderStatusEnum):
+    if not isinstance(status, OrderStatusEnum):
+        raise ValueError('Неверный статус заказа')
+
+    db_order.status = status
+    db.commit()
+    db.refresh(db_order)
+
+    return db_order
 
 
 def get_all_orders(db: Session, skip: int = 0, limit: int = 100):

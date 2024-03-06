@@ -4,7 +4,7 @@ from src.kafka_service.producer.producer import producer
 
 if __name__ == '__main__':
 
-    order_id = 9999
+    order_id = 1
 
     while True:
         message = {'order_id': order_id}
