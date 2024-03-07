@@ -24,7 +24,7 @@ async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get
     return orders
 
 
-@router.post('/', response_model=dict)
+@router.post('/', response_model=dict[str, str])
 async def add_order(
         order: OrderInSchema,
         db: Session = Depends(get_db),
