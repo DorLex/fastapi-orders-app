@@ -5,7 +5,7 @@ from src.accounts.routers import registration
 from src.database import engine, Base
 from src.orders.routers import orders
 
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title='Orders App',

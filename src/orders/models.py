@@ -1,4 +1,4 @@
-from sqlalchemy import String, ForeignKey
+from sqlalchemy import String, ForeignKey, Integer
 from sqlalchemy.dialects.postgresql import ENUM
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -9,11 +9,12 @@ from src.orders.enums import OrderStatusEnum
 class OrderModel(Base):
     __tablename__ = 'orders'
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     title: Mapped[str] = mapped_column(String(100))
 
     status: Mapped[OrderStatusEnum] = mapped_column(
-        ENUM(OrderStatusEnum),
+        ENUM(OrderStatusEnum, name='order_status_enum'),
+        nullable=False,
         default=OrderStatusEnum.in_processing
     )
 
