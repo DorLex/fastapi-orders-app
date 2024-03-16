@@ -4,6 +4,7 @@ from starlette.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from src.accounts.schemas.user import UserSchema
 from src.database import Base
 from src.dependencies import get_db
 from src.main import app
@@ -43,13 +44,14 @@ def base_test_user_data():
 
 
 @pytest.fixture(scope='session')
-def create_base_test_user(prepare_db, client, base_test_user_data):
+def base_test_user(prepare_db, client, base_test_user_data):
     response = client.post('/register', json=base_test_user_data)
     assert response.status_code == status.HTTP_201_CREATED, response.text
+    return UserSchema(**response.json())
 
 
 @pytest.fixture(scope='session')
-def access_token(create_base_test_user, client, base_test_user_data):
+def access_token(base_test_user, client, base_test_user_data):
     response = client.post('/auth/token', data=base_test_user_data)
     assert response.status_code == status.HTTP_200_OK, response.text
     return response.json().get('access_token')
