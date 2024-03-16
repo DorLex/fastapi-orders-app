@@ -32,7 +32,6 @@ def update_order_status(db: Session, db_order: OrderModel, status: OrderStatusEn
 
     db_order.status = status
     db.commit()
-    db.refresh(db_order)
 
     return db_order
 
