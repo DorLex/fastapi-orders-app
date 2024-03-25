@@ -1,4 +1,4 @@
-from kafka.consumer.fetcher import ConsumerRecord
+from aiokafka import ConsumerRecord
 
 from src.order_processing.notification import send_notification
 from src.order_processing.processing.logic import execute_order
