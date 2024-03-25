@@ -40,7 +40,7 @@ async def add_order(
     async with producer as pd:
         await pd.send_and_wait('orders', message)
 
-    return {'message': f'Заказ {db_order.title} №{db_order.id} принят на обработку'}
+    return {'message': f'Заказ №{db_order.id} принят на обработку. (Статус: created)'}
 
 
 @router.get('/my/', response_model=list[OrderOutSchema])

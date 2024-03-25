@@ -16,9 +16,12 @@ def execute_order(order_id):
         if not db_order:
             raise Exception(f'Заказ №{order_id} не найден!')
 
-        order_processing_successful = do_something_with_order(db_order)
+        if db_order.status == OrderStatusEnum.created:
+            update_order_status(db, db_order, OrderStatusEnum.in_processing)
 
-        if not order_processing_successful:
-            raise Exception(f'Произошла ошибка при обработке Заказа №{order_id}')
+            order_processing_successful = do_something_with_order(db_order)
 
-        update_order_status(db, db_order, OrderStatusEnum.completed)
+            if not order_processing_successful:
+                raise Exception(f'Произошла ошибка при обработке Заказа №{order_id}')
+
+            update_order_status(db, db_order, OrderStatusEnum.completed)
