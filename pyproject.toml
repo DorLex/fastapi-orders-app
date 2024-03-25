@@ -15,7 +15,7 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 sqlalchemy = "^2.0.27"
 alembic = "^1.13.1"
 psycopg2-binary = "^2.9.9"
-kafka-python = "^2.0.2"
+aiokafka = "^0.10.0"
 
 
 [tool.poetry.group.test.dependencies]
