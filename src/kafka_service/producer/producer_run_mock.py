@@ -14,6 +14,3 @@ if __name__ == '__main__':
 
         sleep(2)
         order_id += 1
-
-# docker compose exec app python -m src.kafka_service.producer.producer_run_mock
-# docker compose exec app python -m src.run_consumer
