@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from src.accounts.models import UserModel
 from src.accounts.service.auth import get_current_user, verify_token
 from src.dependencies import get_db
-from src.kafka_service.producer.producer import producer
+from src.kafka_service.producer.producer import get_producer
 from src.orders.models import OrderModel
 from src.orders.schemas import OrderInSchema, OrderOutSchema
 from src.orders.service.crud import create_order, get_all_orders, get_user_orders
@@ -35,7 +35,10 @@ async def add_order(
     db_order: OrderModel = create_order(db, current_user, order)
 
     message = {'order_id': db_order.id}
-    producer.send('orders', message)
+
+    producer = await get_producer()
+    async with producer as pd:
+        await pd.send_and_wait('orders', message)
 
     return {'message': f'Заказ {db_order.title} №{db_order.id} принят на обработку'}
 

@@ -1,4 +1,7 @@
-from src.kafka_service.consumer.consumer_listener import run_consumer_listening
+import asyncio
+
+from src.kafka_service.consumer.consumer_listener import consumer_listening
 
 if __name__ == '__main__':
-    run_consumer_listening()
+    asyncio.run(consumer_listening())
+    # run_consumer_listening()
