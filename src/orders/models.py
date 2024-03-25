@@ -15,7 +15,7 @@ class OrderModel(Base):
     status: Mapped[OrderStatusEnum] = mapped_column(
         ENUM(OrderStatusEnum, name='order_status_enum'),
         nullable=False,
-        default=OrderStatusEnum.in_processing
+        default=OrderStatusEnum.created
     )
 
     description: Mapped[str] = mapped_column(String)
