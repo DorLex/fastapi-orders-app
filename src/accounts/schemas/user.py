@@ -24,7 +24,7 @@ class UserInDBSchema(UserBaseSchema):
     hashed_password: str
 
 
-class UserSchema(UserBaseSchema):
+class UserOutSchema(UserBaseSchema):
     id: int
 
     class Config:

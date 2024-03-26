@@ -4,7 +4,7 @@ from starlette.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from src.accounts.schemas.user import UserSchema
+from src.accounts.schemas.user import UserOutSchema
 from src.database import Base
 from src.dependencies import get_db
 from src.main import app
@@ -47,7 +47,7 @@ def base_test_user_data():
 def base_test_user(prepare_db, client, base_test_user_data):
     response = client.post('/register', json=base_test_user_data)
     assert response.status_code == status.HTTP_201_CREATED, response.text
-    return UserSchema(**response.json())
+    return UserOutSchema(**response.json())
 
 
 @pytest.fixture(scope='session')

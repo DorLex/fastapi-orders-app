@@ -4,9 +4,11 @@ from sqlalchemy.orm import Session
 
 from src.accounts.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from src.accounts.exceptions import InvalidTokenException, CredentialsException
+from src.accounts.models import UserModel
 from src.accounts.schemas.token import TokenDataSchema
 from src.accounts.schemas.user import UserInDBSchema
-from src.accounts.service.crud import get_user_by_username
+from src.accounts.services.crud import get_user_by_username
+from src.accounts.services.user import UserService
 from src.accounts.utils.auth import verify_password, generate_token_expire
 from src.accounts.dependencies import oauth2_scheme
 from src.dependencies import get_db
@@ -21,13 +23,13 @@ def create_access_token(username: str):
     return encoded_jwt
 
 
-def authenticate_user(db: Session, username: str, password: str):
-    user: UserInDBSchema = get_user_by_username(db, username)
-    if not user:
+def authenticate_user(db: Session, username: str, password: str) -> UserModel | bool:
+    db_user: UserModel = UserService(db).get_by_username(username)
+    if not db_user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, db_user.hashed_password):
         return False
-    return user
+    return db_user
 
 
 def verify_token(token: str = Depends(oauth2_scheme)):
@@ -45,8 +47,8 @@ def verify_token(token: str = Depends(oauth2_scheme)):
     return token_data
 
 
-def get_current_user(token_data: TokenDataSchema = Depends(verify_token), db: Session = Depends(get_db)):
-    user = get_user_by_username(db, username=token_data.username)
-    if user is None:
+def get_current_user(token_data: TokenDataSchema = Depends(verify_token), db: Session = Depends(get_db)) -> UserModel:
+    db_user: UserModel = UserService(db).get_by_username(token_data.username)
+    if db_user is None:
         raise CredentialsException
-    return user
+    return db_user

@@ -22,6 +22,7 @@ def execute_order(order_id):
             order_processing_successful = do_something_with_order(db_order)
 
             if not order_processing_successful:
+                update_order_status(db, db_order, OrderStatusEnum.failed)
                 raise Exception(f'Произошла ошибка при обработке Заказа №{order_id}')
 
             update_order_status(db, db_order, OrderStatusEnum.completed)

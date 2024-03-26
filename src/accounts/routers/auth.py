@@ -5,7 +5,8 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from starlette import status
 
-from src.accounts.service.auth import authenticate_user, create_access_token
+from src.accounts.models import UserModel
+from src.accounts.services.auth import authenticate_user, create_access_token
 from src.accounts.schemas.token import TokenSchema
 from src.dependencies import get_db
 
@@ -18,17 +19,16 @@ router = APIRouter(
 @router.post('/token/', response_model=TokenSchema)
 async def login_for_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-        # form_data: Annotated[UserCreate, Body()],
         db: Session = Depends(get_db)
 ):
     """Авторизация"""
 
-    user = authenticate_user(db, form_data.username, form_data.password)
+    user: UserModel = authenticate_user(db, form_data.username, form_data.password)
 
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail='Incorrect username or password',
+            detail='Неверное имя пользователя или пароль',
             headers={'WWW-Authenticate': 'Bearer'}
         )
 

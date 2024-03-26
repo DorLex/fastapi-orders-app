@@ -1,6 +1,7 @@
 from starlette import status
 
-from src.accounts.service.crud import get_user_by_username
+from src.accounts.models import UserModel
+from src.accounts.repositories.user import UserRepository
 from tests.conftest import SessionTest
 
 
@@ -17,5 +18,5 @@ def test_registration(client):
     assert response.json().get('username') == username
 
     with SessionTest() as db:
-        db_user = get_user_by_username(db, username)
+        db_user: UserModel = UserRepository(db).get_by_username(username)
         assert db_user.username == username
