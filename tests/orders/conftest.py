@@ -1,7 +1,7 @@
 import pytest
 
 from src.orders.schemas import OrderInSchema
-from src.orders.service.crud import create_order
+from src.orders.service_old.crud import create_order
 from tests.conftest import SessionTest
 
 

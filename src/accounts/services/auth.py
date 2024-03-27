@@ -6,8 +6,6 @@ from src.accounts.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUT
 from src.accounts.exceptions import InvalidTokenException, CredentialsException
 from src.accounts.models import UserModel
 from src.accounts.schemas.token import TokenDataSchema
-from src.accounts.schemas.user import UserInDBSchema
-from src.accounts.services.crud import get_user_by_username
 from src.accounts.services.user import UserService
 from src.accounts.utils.auth import verify_password, generate_token_expire
 from src.accounts.dependencies import oauth2_scheme

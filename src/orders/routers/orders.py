@@ -8,7 +8,7 @@ from src.kafka_service.producer.producer import get_producer
 from src.orders.models import OrderModel
 from src.orders.repository import OrderRepository
 from src.orders.schemas import OrderInSchema, OrderOutSchema
-from src.orders.service.crud import create_order, get_all_orders, get_user_orders
+from src.orders.service_old.crud import create_order, get_user_orders
 
 router = APIRouter(
     prefix='/orders',

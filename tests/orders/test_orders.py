@@ -1,7 +1,7 @@
 import pytest
 
 from src.orders.enums import OrderStatusEnum
-from src.orders.service.crud import update_order_status
+from src.orders.service_old.crud import update_order_status
 from tests.conftest import SessionTest
 
 

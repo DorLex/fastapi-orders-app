@@ -2,7 +2,7 @@ from time import sleep
 
 from src.database import SessionLocal
 from src.orders.enums import OrderStatusEnum
-from src.orders.service.crud import get_order_by_id, update_order_status
+from src.orders.service_old.crud import get_order_by_id, update_order_status
 
 
 def do_something_with_order(db_order):

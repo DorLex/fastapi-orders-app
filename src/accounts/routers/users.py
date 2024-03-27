@@ -5,7 +5,6 @@ from src.accounts.models import UserModel
 from src.accounts.services.auth import get_current_user, verify_token
 
 from src.accounts.schemas.user import UserOutSchema
-from src.accounts.services.crud import get_users
 from src.accounts.services.user import UserService
 from src.dependencies import get_db
 
