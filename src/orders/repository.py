@@ -11,11 +11,11 @@ class OrderRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def create(self, user: UserModel, order: OrderInSchema) -> OrderModel:
+    def create(self, db_user: UserModel, order: OrderInSchema) -> OrderModel:
         db_order: OrderModel = OrderModel(
             title=order.title,
             description=order.description,
-            owner_id=user.id
+            owner_id=db_user.id
         )
 
         self.session.add(db_order)
@@ -36,7 +36,7 @@ class OrderRepository:
         query = select(OrderModel).where(OrderModel.owner_id == user.id).offset(skip).limit(limit)
         return self.session.scalars(query).all()
 
-    def update_order_status(self, db_order: OrderModel, status: OrderStatusEnum):
+    def update_order_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
         if not isinstance(status, OrderStatusEnum):
             raise ValueError('Неверный статус заказа')
 
