@@ -14,16 +14,16 @@ class UserRepository:
     def create(self, user: UserCreateSchema) -> UserModel:
         hashed_password = get_password_hash(user.password)
 
-        user: UserModel = UserModel(
+        db_user: UserModel = UserModel(
             username=user.username,
             hashed_password=hashed_password
         )
 
-        self.session.add(user)
+        self.session.add(db_user)
         self.session.commit()
-        self.session.refresh(user)
+        self.session.refresh(db_user)
 
-        return user
+        return db_user
 
     def get_all(self, skip: int = 0, limit: int = 100):
         query = select(UserModel).offset(skip).limit(limit)
