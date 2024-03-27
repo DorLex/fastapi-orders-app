@@ -1,19 +1,17 @@
 import os
 
-from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from src.config import BASE_DIR
+MODE = os.getenv('MODE')
 
-DOTENV_PATH_TEST = BASE_DIR / 'tests/.test.env'
-
-load_dotenv(DOTENV_PATH_TEST)
-
-DB_USER_TEST = os.getenv('POSTGRES_USER_TEST')
-DB_PASS_TEST = os.getenv('POSTGRES_PASSWORD_TEST')
-DB_HOST_TEST = os.getenv('POSTGRES_HOST_TEST')
-DB_PORT_TEST = os.getenv('POSTGRES_PORT_TEST')
-DB_NAME_TEST = os.getenv('POSTGRES_DB_TEST')
+DB_USER_TEST = os.getenv('POSTGRES_USER')
+DB_PASS_TEST = os.getenv('POSTGRES_PASSWORD')
+DB_HOST_TEST = os.getenv('POSTGRES_HOST')
+DB_PORT_TEST = os.getenv('POSTGRES_PORT')
+DB_NAME_TEST = os.getenv('POSTGRES_DB')
 
 DATABASE_URL_TEST = f'postgresql+psycopg2://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'
 
-MODE = os.getenv('MODE')
+engine_test = create_engine(DATABASE_URL_TEST)
+SessionTest = sessionmaker(engine_test, autocommit=False, autoflush=False)

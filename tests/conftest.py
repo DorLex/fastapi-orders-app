@@ -1,17 +1,12 @@
 import pytest
 from starlette import status
 from starlette.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from src.accounts.schemas.user import UserOutSchema
 from src.database import Base
 from src.dependencies import get_db
 from src.main import app
-from .config import DATABASE_URL_TEST, MODE
-
-engine_test = create_engine(DATABASE_URL_TEST)
-SessionTest = sessionmaker(engine_test, autocommit=False, autoflush=False)
+from .config import MODE, engine_test, SessionTest
 
 
 @pytest.fixture(scope='session', autouse=True)
