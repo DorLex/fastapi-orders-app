@@ -32,13 +32,13 @@ class OrderRepository:
         query = select(OrderModel).where(OrderModel.id == order_id)
         return self.session.scalar(query)
 
-    def get_by_user(self, user: UserModel, skip: int = 0, limit: int = 100):
-        query = select(OrderModel).where(OrderModel.owner_id == user.id).offset(skip).limit(limit)
+    def get_by_user(self, db_user: UserModel, skip: int = 0, limit: int = 100):
+        query = select(OrderModel).where(OrderModel.owner_id == db_user.id).offset(skip).limit(limit)
         return self.session.scalars(query).all()
 
-    def update_order_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
+    def update_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
         if not isinstance(status, OrderStatusEnum):
-            raise ValueError('Неверный статус заказа')
+            raise ValueError('Недопустимый статус заказа')
 
         db_order.status = status
         self.session.commit()

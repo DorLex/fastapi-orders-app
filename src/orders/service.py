@@ -21,8 +21,8 @@ class OrderService:
     def get_by_id(self, order_id: int) -> OrderModel:
         return self._repository.get_by_id(order_id)
 
-    def get_by_user(self, user: UserModel, skip: int = 0, limit: int = 100) -> list[OrderModel]:
-        return self._repository.get_by_user(user, skip, limit)
+    def get_by_user(self, db_user: UserModel, skip: int = 0, limit: int = 100) -> list[OrderModel]:
+        return self._repository.get_by_user(db_user, skip, limit)
 
-    def update_order_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
-        return self._repository.update_order_status(db_order, status)
+    def update_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
+        return self._repository.update_status(db_order, status)

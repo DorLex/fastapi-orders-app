@@ -2,27 +2,31 @@ from time import sleep
 
 from src.database import SessionLocal
 from src.orders.enums import OrderStatusEnum
-from src.orders.service_old.crud import get_order_by_id, update_order_status
+from src.orders.models import OrderModel
+from src.orders.service import OrderService
 
 
-def do_something_with_order(db_order):
+def do_something_with_order(_):
     sleep(5)
     return True
 
 
 def execute_order(order_id):
     with SessionLocal() as db:
-        db_order = get_order_by_id(db, order_id)
+        order_service = OrderService(db)
+
+        db_order: OrderModel = order_service.get_by_id(order_id)
+
         if not db_order:
             raise Exception(f'Заказ №{order_id} не найден!')
 
         if db_order.status == OrderStatusEnum.created:
-            update_order_status(db, db_order, OrderStatusEnum.in_processing)
+            order_service.update_status(db_order, OrderStatusEnum.in_processing)
 
             order_processing_successful = do_something_with_order(db_order)
 
             if not order_processing_successful:
-                update_order_status(db, db_order, OrderStatusEnum.failed)
+                order_service.update_status(db_order, OrderStatusEnum.failed)
                 raise Exception(f'Произошла ошибка при обработке Заказа №{order_id}')
 
-            update_order_status(db, db_order, OrderStatusEnum.completed)
+            order_service.update_status(db_order, OrderStatusEnum.completed)

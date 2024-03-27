@@ -6,9 +6,8 @@ from src.accounts.services.auth import get_current_user, verify_token
 from src.dependencies import get_db
 from src.kafka_service.producer.producer import get_producer
 from src.orders.models import OrderModel
-from src.orders.repository import OrderRepository
 from src.orders.schemas import OrderInSchema, OrderOutSchema
-from src.orders.service_old.crud import create_order, get_user_orders
+from src.orders.service import OrderService
 
 router = APIRouter(
     prefix='/orders',
@@ -21,10 +20,7 @@ router = APIRouter(
 async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     """Показать все заказы"""
 
-    # orders = get_all_orders(db, skip=skip, limit=limit)
-
-    repository = OrderRepository()
-    orders = repository.get_all(skip, limit)
+    orders: list[OrderModel] = OrderService(db).get_all(skip, limit)
     return orders
 
 
@@ -36,7 +32,7 @@ async def add_order(
 ):
     """Добавить заказ"""
 
-    db_order: OrderModel = create_order(db, current_user, order)
+    db_order: OrderModel = OrderService(db).create(current_user, order)
 
     message = {'order_id': db_order.id}
 
@@ -56,5 +52,5 @@ async def read_my_orders(
 ):
     """Показать заказы текущего пользователя"""
 
-    user_orders = get_user_orders(db, current_user, skip=skip, limit=limit)
+    user_orders: list[OrderModel] = OrderService(db).get_by_user(current_user, skip, limit)
     return user_orders
