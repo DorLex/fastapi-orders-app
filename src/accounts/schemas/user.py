@@ -1,8 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserBaseSchema(BaseModel):
     username: str
+    email: EmailStr
 
 
 class UserCreateSchema(UserBaseSchema):
@@ -13,6 +14,7 @@ class UserCreateSchema(UserBaseSchema):
             'examples': [
                 {
                     'username': 'alex',
+                    'email': 'example@gmail.com',
                     'password': '123456789',
                 }
             ]
