@@ -16,7 +16,7 @@ class UserService:
     def get_all(self, skip: int = 0, limit: int = 100) -> list[UserModel]:
         return self._repository.get_all(skip, limit)
 
-    def get_filter_by(self, **filters):
+    def get_filter_by(self, **filters) -> list[UserModel]:
         return self._repository.get_filter_by(**filters)
 
     def get_by_username(self, username: str) -> UserModel:

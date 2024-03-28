@@ -16,6 +16,7 @@ class UserRepository:
 
         db_user: UserModel = UserModel(
             username=user.username,
+            email=user.email,
             hashed_password=hashed_password
         )
 

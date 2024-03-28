@@ -19,8 +19,9 @@ async def register_user(user: UserCreateSchema, db: Session = Depends(get_db)):
 
     user_service = UserService(db)
 
-    db_user: UserModel = user_service.get_by_username(user.username)
-    if db_user:
-        raise HTTPException(status_code=400, detail='Пользователь с таким именем уже зарегистрирован')
+    check_user_registered = user_service.get_filter_by(username=user.username, email=user.email)
+
+    if check_user_registered:
+        raise HTTPException(status_code=400, detail='Пользователь с таким именем и почтой уже зарегистрирован')
 
     return user_service.create(user)
