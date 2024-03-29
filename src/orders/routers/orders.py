@@ -34,7 +34,7 @@ async def add_order(
 
     db_order: OrderModel = OrderService(db).create(current_user, order)
 
-    message = {'order_id': db_order.id}
+    message = {'order_id': db_order.id, 'customer_email': current_user.email}
 
     producer = await get_producer()
     async with producer as pd:

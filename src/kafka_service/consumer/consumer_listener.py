@@ -1,5 +1,5 @@
 from src.kafka_service.consumer.consumer import get_consumer
-from src.order_processing.processing.processing import run_order_processing
+from src.order_processing.processing import run_order_processing
 
 
 async def consumer_listening():
