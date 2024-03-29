@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, BackgroundTasks
 
 from src.accounts.services.auth import verify_token
 from src.notifications.schemas import EmailSchema
-from src.notifications.service import EmailNotificationService
+from src.notifications.services.email_notification import EmailNotificationService
 
 router = APIRouter(
     prefix='/notifications',

@@ -1,5 +1,5 @@
 from src.kafka_service.consumer.consumer import get_consumer
-from src.order_processing.processing.processing import process_order
+from src.order_processing.processing.processing import run_order_processing
 
 
 async def consumer_listening():
@@ -7,4 +7,4 @@ async def consumer_listening():
 
     async with consumer as cs:
         async for message in cs:
-            process_order(message)
+            await run_order_processing(message)

@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 
 from src.accounts.models import UserModel
+from src.notifications.schemas import EmailSchema
+from src.notifications.services.email_build import EmailBuildService
+from src.notifications.services.email_notification import EmailNotificationService
 from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.repository import OrderRepository
@@ -11,6 +14,8 @@ class OrderService:
 
     def __init__(self, session: Session):
         self._repository = OrderRepository(session)
+        self._notification_service = EmailNotificationService()
+        self._email_build_service = EmailBuildService()
 
     def create(self, db_user: UserModel, order: OrderInSchema) -> OrderModel:
         return self._repository.create(db_user, order)
@@ -24,5 +29,9 @@ class OrderService:
     def get_by_user(self, db_user: UserModel, skip: int = 0, limit: int = 100) -> list[OrderModel]:
         return self._repository.get_by_user(db_user, skip, limit)
 
-    def update_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
-        return self._repository.update_status(db_order, status)
+    async def update_status(self, db_order: OrderModel, status: OrderStatusEnum) -> OrderModel:
+        updated_order = self._repository.update_status(db_order, status)
+        email: EmailSchema = self._email_build_service.build_order_status_changed_email(updated_order)
+        await self._notification_service.send_email(email)
+
+        return updated_order
