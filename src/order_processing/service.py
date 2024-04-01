@@ -3,12 +3,15 @@ from asyncio import sleep
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
+from logger.logger import get_logger
 from src.notifications.schemas import EmailSchema
 from src.notifications.services.email_build import EmailBuildService
 from src.notifications.services.email_notification import EmailNotificationService
 from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.service import OrderService
+
+logger = get_logger(__name__)
 
 
 class OrderProcessingService:
@@ -35,7 +38,7 @@ class OrderProcessingService:
             await self._order_service.update_status(db_order, OrderStatusEnum.completed)
 
         except Exception as ex:
-            print(f'<Exception: {ex}>')
+            logger.error(ex)
 
     async def order_not_found(self, order_id: int, customer_email: EmailStr) -> None:
         email: EmailSchema = self._email_build_service.build_order_not_found_email(order_id, customer_email)

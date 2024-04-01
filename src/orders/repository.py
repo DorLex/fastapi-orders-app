@@ -1,10 +1,13 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from logger.logger import get_logger
 from src.accounts.models import UserModel
 from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.schemas import OrderInSchema
+
+logger = get_logger(__name__)
 
 
 class OrderRepository:
@@ -42,5 +45,7 @@ class OrderRepository:
 
         db_order.status = status
         self.session.commit()
+
+        logger.info(f'Статус заказа №{db_order.id} изменен на {status.value}')
 
         return db_order
