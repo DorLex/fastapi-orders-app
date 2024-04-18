@@ -15,4 +15,4 @@ class TestOrders:
     def test_update_order_status_negative(self, base_test_order):
         with SessionTest() as db:
             with pytest.raises(ValueError):
-                OrderRepository(db).update_status(base_test_order, 'incorrect_status')
+                OrderRepository(db).update_status(base_test_order, 'incorrect_status')  # type: ignore

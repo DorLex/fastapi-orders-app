@@ -9,6 +9,7 @@ def test_registration(client):
     username = 'reg_user_1'
     reg_user_1 = {
         'username': username,
+        'email': 'reg-user-1@test.com',
         'password': '123456789',
     }
 

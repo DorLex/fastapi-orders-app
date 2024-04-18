@@ -34,6 +34,7 @@ def client():
 def base_test_user_data():
     return {
         'username': 'base_test_user',
+        'email': 'base-test-user@test.com',
         'password': '123456789',
     }
 
