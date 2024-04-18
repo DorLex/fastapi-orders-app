@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.post('/token/', response_model=TokenSchema)
-async def login_for_access_token(
+async def login_by_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
         db: Session = Depends(get_db)
 ):

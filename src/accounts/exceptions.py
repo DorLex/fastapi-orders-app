@@ -3,10 +3,10 @@ from starlette import status
 
 InvalidTokenException = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Invalid token'
+    detail='Неверный Токен'
 )
 
 CredentialsException = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail='Could not validate credentials'
+    detail='Не удалось проверить учетные данные'
 )
