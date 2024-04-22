@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.post('/send-email/', response_model=dict)
+@router.post('/send-email/', response_model=dict[str, str])
 async def send_email(email: EmailSchema, background_tasks: BackgroundTasks):
     background_tasks.add_task(EmailNotificationService().send_email, email)
 
