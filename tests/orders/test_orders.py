@@ -1,11 +1,12 @@
 import pytest
-from aiokafka import AIOKafkaProducer
 from starlette import status
 
 from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.repository import OrderRepository
+from src.orders.routers import orders
 from tests.conftest import SessionTest
+from tests.orders.mocks import mock_get_producer
 
 
 class TestOrdersPositive:
@@ -14,16 +15,13 @@ class TestOrdersPositive:
         'description': 'test_order_1 description'
     }
 
-    async def mock_send_and_wait(*args, **kwargs):
-        return True
-
     def test_read_orders(self, client, auth_headers):
         response = client.get('/orders', headers=auth_headers)
         assert response.status_code == status.HTTP_200_OK, response.text
         assert len(response.json()) > 0
 
     def test_add_order(self, client, auth_headers, monkeypatch):
-        monkeypatch.setattr(AIOKafkaProducer, 'send_and_wait', self.mock_send_and_wait)
+        monkeypatch.setattr(orders, 'get_producer', mock_get_producer)
 
         response = client.post('/orders', json=self.order_data, headers=auth_headers)
         assert response.status_code == status.HTTP_201_CREATED, response.text
