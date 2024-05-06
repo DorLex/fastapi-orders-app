@@ -1,14 +1,17 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase
 
 from .config import SQLALCHEMY_DATABASE_URL
 
-engine = create_engine(
+async_engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,
     # echo=True
 )
 
-SessionLocal = sessionmaker(engine, autocommit=False, autoflush=False)
+SessionLocal = async_sessionmaker(
+    async_engine,
+    expire_on_commit=False  # влияет на возврат объекта при создании в БД с использованием session.flush()
+)
 
 
 class Base(DeclarativeBase):

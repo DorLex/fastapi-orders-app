@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.accounts.models import UserModel
 from src.accounts.services.auth import get_current_user, verify_token
@@ -16,15 +16,15 @@ router = APIRouter(
 
 
 @router.get('/', response_model=list[UserOutSchema])
-async def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_users(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     """Показать всех пользователей"""
 
-    users: list[UserModel] = UserService(db).get_all(skip, limit)
+    users: list[UserModel] = await UserService(db).get_all(skip, limit)
     return users
 
 
 @router.get('/me/', response_model=UserOutSchema)
-async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
+async def read_users_me(current_user: UserModel = Depends(get_current_user)):
     """Показать текущего пользователя"""
 
     return current_user

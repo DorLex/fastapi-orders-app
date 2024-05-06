@@ -1,6 +1,6 @@
 from .database import SessionLocal
 
 
-def get_db():
-    with SessionLocal() as db:
+async def get_db():
+    async with SessionLocal() as db:
         yield db
