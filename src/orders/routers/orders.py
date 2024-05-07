@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from src.accounts.models import UserModel
@@ -7,7 +7,7 @@ from src.accounts.services.auth import get_current_user, verify_token
 from src.dependencies import get_db
 from src.kafka_service.producer.producer import get_producer
 from src.orders.models import OrderModel
-from src.orders.schemas import OrderInSchema, OrderOutSchema
+from src.orders.schemas import OrderCreateSchema, OrderOutSchema
 from src.orders.service import OrderService
 
 router = APIRouter(
@@ -18,22 +18,22 @@ router = APIRouter(
 
 
 @router.get('/', response_model=list[OrderOutSchema])
-async def read_orders(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+async def read_orders(skip: int = 0, limit: int = 100, db: AsyncSession = Depends(get_db)):
     """Показать все заказы"""
 
-    orders: list[OrderModel] = OrderService(db).get_all(skip, limit)
+    orders: list[OrderModel] = await OrderService(db).get_all(skip, limit)
     return orders
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=dict[str, int | str])
 async def add_order(
-        order: OrderInSchema,
-        db: Session = Depends(get_db),
+        order: OrderCreateSchema,
+        db: AsyncSession = Depends(get_db),
         current_user: UserModel = Depends(get_current_user)
 ):
     """Добавить заказ"""
 
-    db_order: OrderModel = OrderService(db).create(current_user, order)
+    db_order: OrderModel = await OrderService(db).create(current_user, order)
 
     message = {'order_id': db_order.id, 'customer_email': current_user.email}
 
@@ -48,10 +48,10 @@ async def add_order(
 async def read_my_orders(
         skip: int = 0,
         limit: int = 100,
-        db: Session = Depends(get_db),
+        db: AsyncSession = Depends(get_db),
         current_user: UserModel = Depends(get_current_user)
 ):
     """Показать заказы текущего пользователя"""
 
-    user_orders: list[OrderModel] = OrderService(db).get_by_user(current_user, skip, limit)
+    user_orders: list[OrderModel] = await OrderService(db).get_by_user(current_user, skip, limit)
     return user_orders

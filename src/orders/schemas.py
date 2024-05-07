@@ -8,7 +8,7 @@ class OrderBaseSchema(BaseModel):
     description: str
 
 
-class OrderInSchema(OrderBaseSchema):
+class OrderCreateSchema(OrderBaseSchema):
     pass
 
 

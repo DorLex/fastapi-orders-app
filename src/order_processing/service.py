@@ -1,7 +1,7 @@
 from asyncio import sleep
 
 from pydantic import EmailStr
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from logger.logger import get_logger
 from src.notifications.schemas import EmailSchema
@@ -16,13 +16,13 @@ logger = get_logger(__name__)
 
 class OrderProcessingService:
 
-    def __init__(self, session: Session):
+    def __init__(self, session: AsyncSession):
         self._order_service = OrderService(session)
         self._notification_service = EmailNotificationService()
         self._email_build_service = EmailBuildService()
 
     async def execute_order(self, order_id: int, customer_email: EmailStr) -> None:
-        db_order: OrderModel = self._order_service.get_by_id(order_id)
+        db_order: OrderModel = await self._order_service.get_by_id(order_id)
 
         try:
             if not db_order:
