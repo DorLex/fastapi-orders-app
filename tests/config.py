@@ -1,7 +1,7 @@
 import os
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import NullPool
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 MODE = os.getenv('MODE')
 
@@ -11,7 +11,15 @@ DB_HOST_TEST = os.getenv('POSTGRES_HOST')
 DB_PORT_TEST = os.getenv('POSTGRES_PORT')
 DB_NAME_TEST = os.getenv('POSTGRES_DB')
 
-DATABASE_URL_TEST = f'postgresql+psycopg2://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'
+DATABASE_URL_TEST = f'postgresql+asyncpg://{DB_USER_TEST}:{DB_PASS_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'
 
-engine_test = create_engine(DATABASE_URL_TEST)
-SessionTest = sessionmaker(engine_test, autocommit=False, autoflush=False)
+async_engine_test = create_async_engine(
+    DATABASE_URL_TEST,
+    poolclass=NullPool,
+    # echo=True
+)
+
+SessionTest = async_sessionmaker(
+    async_engine_test,
+    expire_on_commit=False
+)
