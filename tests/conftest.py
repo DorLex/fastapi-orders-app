@@ -1,6 +1,7 @@
 from typing import AsyncGenerator
 
 import pytest
+from fastapi import FastAPI
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
@@ -8,7 +9,7 @@ from starlette import status
 from src.accounts.schemas.user import UserOutSchema
 from src.database import Base
 from src.dependencies import get_db
-from src.main import app
+from src.main import app as main_app
 from .config import MODE, async_engine_test, SessionTest
 
 
@@ -30,11 +31,16 @@ async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
         yield db
 
 
-app.dependency_overrides[get_db] = override_get_db
+main_app.dependency_overrides[get_db] = override_get_db
 
 
 @pytest.fixture(scope='session')
-async def client() -> AsyncGenerator[AsyncClient, None]:
+def app():
+    return main_app
+
+
+@pytest.fixture(scope='session')
+async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     async with AsyncClient(app=app, base_url='http://test') as async_client:
         yield async_client
 
@@ -49,16 +55,22 @@ async def base_test_user_data():
 
 
 @pytest.fixture(scope='session')
-async def base_test_user(prepare_db, client: AsyncClient, base_test_user_data):
-    response = await client.post('/registration/', json=base_test_user_data)
+async def base_test_user(app: FastAPI, prepare_db, client: AsyncClient, base_test_user_data):
+    url = app.url_path_for('user_registration')
+    response = await client.post(url, json=base_test_user_data)
+
     assert response.status_code == status.HTTP_201_CREATED, response.text
+
     return UserOutSchema(**response.json())
 
 
 @pytest.fixture(scope='session')
-async def access_token(base_test_user, client: AsyncClient, base_test_user_data):
-    response = await client.post('/auth/token/', data=base_test_user_data)
+async def access_token(app: FastAPI, base_test_user, client: AsyncClient, base_test_user_data):
+    url = app.url_path_for('login_by_access_token')
+    response = await client.post(url, data=base_test_user_data)
+
     assert response.status_code == status.HTTP_200_OK, response.text
+
     return response.json().get('access_token')
 
 

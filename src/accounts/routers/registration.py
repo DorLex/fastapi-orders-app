@@ -14,7 +14,7 @@ router = APIRouter(
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserOutSchema)
-async def registration_user(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
+async def user_registration(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
     """Регистрация пользователя"""
 
     user_service = UserService(db)
