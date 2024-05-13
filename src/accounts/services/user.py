@@ -7,8 +7,8 @@ from src.accounts.schemas import UserCreateSchema
 
 class UserService:
 
-    def __init__(self, session: AsyncSession):
-        self._repository = UserRepository(session)
+    def __init__(self, repository: UserRepository):
+        self._repository = repository
 
     async def create(self, user: UserCreateSchema):
         return await self._repository.create(user)

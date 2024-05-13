@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
+from src.accounts.dependencies import get_user_service
 from src.accounts.models import UserModel
 from src.accounts.schemas.user import UserCreateSchema, UserOutSchema
 from src.accounts.services.user import UserService
-from src.dependencies import get_db
 
 router = APIRouter(
     prefix='/registration',
@@ -14,10 +13,8 @@ router = APIRouter(
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserOutSchema)
-async def user_registration(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
+async def user_registration(user: UserCreateSchema, user_service: UserService = Depends(get_user_service)):
     """Регистрация пользователя"""
-
-    user_service = UserService(db)
 
     check_user_registered = await user_service.get_filter_by(username=user.username, email=user.email)
 
