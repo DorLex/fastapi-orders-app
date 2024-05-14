@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, ConfigDict
 
 
 class UserBaseSchema(BaseModel):
@@ -9,8 +9,8 @@ class UserBaseSchema(BaseModel):
 class UserCreateSchema(UserBaseSchema):
     password: str
 
-    model_config = {
-        'json_schema_extra': {
+    model_config = ConfigDict(
+        json_schema_extra={
             'examples': [
                 {
                     'username': 'alex',
@@ -19,7 +19,7 @@ class UserCreateSchema(UserBaseSchema):
                 }
             ]
         }
-    }
+    )
 
 
 class UserInDBSchema(UserBaseSchema):
@@ -29,5 +29,4 @@ class UserInDBSchema(UserBaseSchema):
 class UserOutSchema(UserBaseSchema):
     id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
