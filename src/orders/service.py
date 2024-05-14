@@ -1,3 +1,5 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.accounts.models import UserModel
 from src.notifications.schemas import EmailSchema
 from src.notifications.services.email_build import EmailBuildService
@@ -10,8 +12,9 @@ from src.orders.schemas import OrderCreateSchema
 
 class OrderService:
 
-    def __init__(self, repository: OrderRepository):
-        self._repository = repository
+    def __init__(self, session: AsyncSession):
+        self._session = session
+        self._repository = OrderRepository(self._session)
         self._notification_service = EmailNotificationService()
         self._email_build_service = EmailBuildService()
 

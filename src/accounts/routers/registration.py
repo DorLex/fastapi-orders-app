@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.accounts.dependencies import get_user_service
 from src.accounts.models import UserModel
 from src.accounts.schemas.user import UserCreateSchema, UserOutSchema
 from src.accounts.services.user import UserService
+from src.dependencies import get_session
 
 router = APIRouter(
     prefix='/registration',
@@ -13,17 +14,10 @@ router = APIRouter(
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=UserOutSchema)
-async def user_registration(user: UserCreateSchema, user_service: UserService = Depends(get_user_service)):
+async def user_registration(user: UserCreateSchema, session: AsyncSession = Depends(get_session)):
     """Регистрация пользователя"""
 
-    check_user_registered = await user_service.get_filter_by(username=user.username, email=user.email)
-
-    if check_user_registered:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            'Пользователь с таким именем и почтой уже зарегистрирован'
-        )
-
-    db_user: UserModel = await user_service.create(user)
+    db_user: UserModel = await UserService(session).registration(user)
+    await session.commit()
 
     return db_user

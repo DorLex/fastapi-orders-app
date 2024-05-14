@@ -1,5 +1,6 @@
 from fastapi import Depends
 from jose import jwt, JWTError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.accounts.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from src.accounts.exceptions import InvalidTokenException, CredentialsException
@@ -7,7 +8,8 @@ from src.accounts.models import UserModel
 from src.accounts.schemas.token import TokenDataSchema
 from src.accounts.services.user import UserService
 from src.accounts.utils.auth import verify_password, generate_token_expire
-from src.accounts.dependencies import oauth2_scheme, get_user_service
+from src.accounts.dependencies import oauth2_scheme
+from src.dependencies import get_session
 
 
 def create_access_token(user: UserModel) -> str:
@@ -47,9 +49,9 @@ def verify_token(token: str = Depends(oauth2_scheme)) -> TokenDataSchema:
 
 async def get_current_user(
         token_data: TokenDataSchema = Depends(verify_token),
-        user_service: UserService = Depends(get_user_service)
+        session: AsyncSession = Depends(get_session)
 ) -> UserModel:
-    db_user: UserModel = await user_service.get_by_id(token_data.user_id)
+    db_user: UserModel = await UserService(session).get_by_id(token_data.user_id)
     if not db_user:
         raise CredentialsException
     return db_user

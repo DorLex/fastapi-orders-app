@@ -17,7 +17,8 @@ logger = get_logger(__name__)
 class OrderProcessingService:
 
     def __init__(self, session: AsyncSession):
-        self._order_service = OrderService(session)
+        self._session = session
+        self._order_service = OrderService(self._session)
         self._notification_service = EmailNotificationService()
         self._email_build_service = EmailBuildService()
 
@@ -29,6 +30,7 @@ class OrderProcessingService:
                 await self.order_not_found(order_id, customer_email)
 
             await self._order_service.update_status(db_order, OrderStatusEnum.in_processing)
+            await self._session.commit()
 
             order_processing_successful = await self.do_something_with_order(db_order)
 
@@ -36,6 +38,7 @@ class OrderProcessingService:
                 await self.order_processing_failed(db_order)
 
             await self._order_service.update_status(db_order, OrderStatusEnum.completed)
+            await self._session.commit()
 
         except Exception as ex:
             logger.error(ex)

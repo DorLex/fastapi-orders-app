@@ -2,13 +2,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
-from src.accounts.dependencies import get_user_service
 from src.accounts.models import UserModel
 from src.accounts.services.auth import authenticate_user, create_access_token
 from src.accounts.schemas.token import TokenSchema
 from src.accounts.services.user import UserService
+from src.dependencies import get_session
 
 router = APIRouter(
     prefix='/auth',
@@ -19,11 +20,11 @@ router = APIRouter(
 @router.post('/token/', response_model=TokenSchema)
 async def login_by_access_token(
         form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-        user_service: UserService = Depends(get_user_service)
+        session: AsyncSession = Depends(get_session)
 ):
     """Авторизация"""
 
-    db_user: UserModel = await user_service.get_by_username(form_data.username)
+    db_user: UserModel = await UserService(session).get_by_username(form_data.username)
 
     auth_user: UserModel = authenticate_user(db_user, form_data.password)
 

@@ -8,7 +8,7 @@ from starlette import status
 
 from src.accounts.schemas.user import UserOutSchema
 from src.database import Base
-from src.dependencies import get_db
+from src.dependencies import get_session
 from src.main import app as main_app
 from .config import MODE, async_engine_test, SessionTest
 
@@ -26,12 +26,12 @@ async def prepare_db():
         await conn.run_sync(Base.metadata.drop_all)
 
 
-async def override_get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionTest() as db:
-        yield db
+async def override_get_session() -> AsyncGenerator[AsyncSession, None]:
+    async with SessionTest() as session:
+        yield session
 
 
-main_app.dependency_overrides[get_db] = override_get_db
+main_app.dependency_overrides[get_session] = override_get_session
 
 
 @pytest.fixture(scope='session')

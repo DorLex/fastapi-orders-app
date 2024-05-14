@@ -32,8 +32,8 @@ class TestOrdersPositive:
         assert response.status_code == status.HTTP_201_CREATED, response.text
 
         order_id = response.json().get('order_id')
-        async with SessionTest() as db:
-            db_order: OrderModel = await OrderRepository(db).get_by_id(order_id)
+        async with SessionTest() as session:
+            db_order: OrderModel = await OrderRepository(session).get_by_id(order_id)
             assert db_order.title == self.order_data.get('title')
             assert db_order.description == self.order_data.get('description')
 
@@ -44,8 +44,13 @@ class TestOrdersPositive:
         assert len(response.json()) > 0
 
     async def test_update_order_status(self, base_test_order):
-        async with SessionTest() as db:
-            db_order: OrderModel = await OrderRepository(db).update_status(base_test_order, OrderStatusEnum.completed)
+        async with SessionTest() as session:
+            db_order: OrderModel = await OrderRepository(session).update_status(
+                base_test_order,
+                OrderStatusEnum.completed
+            )
+            await session.commit()
+
             assert db_order.status == OrderStatusEnum.completed
 
 
@@ -61,6 +66,6 @@ class TestOrdersNegative:
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY, response.text
 
     async def test_update_order_status(self, base_test_order):
-        async with SessionTest() as db:
+        async with SessionTest() as session:
             with pytest.raises(ValueError):
-                await OrderRepository(db).update_status(base_test_order, 'incorrect_status')  # type: ignore
+                await OrderRepository(session).update_status(base_test_order, 'incorrect_status')  # type: ignore

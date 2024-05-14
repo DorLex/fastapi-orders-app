@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette import status
 
 from src.accounts.models import UserModel
 from src.accounts.services.auth import get_current_user, verify_token
+from src.dependencies import get_session
 from src.kafka_service.producer.producer import get_producer
-from src.orders.dependencies import get_order_service
 from src.orders.models import OrderModel
 from src.orders.schemas import OrderCreateSchema, OrderOutSchema
 from src.orders.service import OrderService
@@ -17,22 +18,23 @@ router = APIRouter(
 
 
 @router.get('/', response_model=list[OrderOutSchema])
-async def read_orders(skip: int = 0, limit: int = 100, order_service: OrderService = Depends(get_order_service)):
+async def read_orders(skip: int = 0, limit: int = 100, session: AsyncSession = Depends(get_session)):
     """Показать все заказы"""
 
-    orders: list[OrderModel] = await order_service.get_all(skip, limit)
+    orders: list[OrderModel] = await OrderService(session).get_all(skip, limit)
     return orders
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=dict[str, int | str])
 async def add_order(
         order: OrderCreateSchema,
-        order_service: OrderService = Depends(get_order_service),
-        current_user: UserModel = Depends(get_current_user)
+        current_user: UserModel = Depends(get_current_user),
+        session: AsyncSession = Depends(get_session)
 ):
     """Добавить заказ"""
 
-    db_order: OrderModel = await order_service.create(current_user, order)
+    db_order: OrderModel = await OrderService(session).create(current_user, order)
+    await session.commit()
 
     message = {'order_id': db_order.id, 'customer_email': current_user.email}
 
@@ -47,10 +49,10 @@ async def add_order(
 async def read_my_orders(
         skip: int = 0,
         limit: int = 100,
-        order_service: OrderService = Depends(get_order_service),
-        current_user: UserModel = Depends(get_current_user)
+        current_user: UserModel = Depends(get_current_user),
+        session: AsyncSession = Depends(get_session)
 ):
     """Показать заказы текущего пользователя"""
 
-    user_orders: list[OrderModel] = await order_service.get_by_user(current_user, skip, limit)
+    user_orders: list[OrderModel] = await OrderService(session).get_by_user(current_user, skip, limit)
     return user_orders
