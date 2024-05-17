@@ -29,6 +29,9 @@ class UserService:
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[UserModel]:
         return await self._repository.get_all(skip, limit)
 
+    async def get_all_with_orders(self, skip: int = 0, limit: int = 100) -> list[UserModel]:
+        return await self._repository.get_all_with_orders(skip, limit)
+
     async def get_filter_by(self, **filters) -> list[UserModel]:
         return await self._repository.get_filter_by(**filters)
 

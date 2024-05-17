@@ -21,7 +21,10 @@ class OrderModel(Base):
     description: Mapped[str] = mapped_column(String)
 
     owner_id: Mapped[int] = mapped_column(ForeignKey('users.id'))
-    owner: Mapped['UserModel'] = relationship(back_populates='orders', lazy='joined')
+    owner: Mapped['UserModel'] = relationship(
+        back_populates='orders',
+        lazy='joined'
+    )
 
     def __repr__(self) -> str:
         return f'Order(id={self.id!r}, title={self.title!r})'

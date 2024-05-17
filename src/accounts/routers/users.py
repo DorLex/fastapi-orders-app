@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.accounts.models import UserModel
 from src.accounts.services.auth import get_current_user, verify_token
-from src.accounts.schemas.user import UserOutSchema
+from src.accounts.schemas.user import UserOutSchema, UserWithOrdersSchema
 from src.accounts.services.user import UserService
 from src.dependencies import get_session
 
@@ -27,3 +27,12 @@ async def read_users_me(current_user: UserModel = Depends(get_current_user)):
     """Показать текущего пользователя"""
 
     return current_user
+
+
+@router.get('/with-orders/', response_model=list[UserWithOrdersSchema])
+async def read_users_with_orders(skip: int = 0, limit: int = 100, session: AsyncSession = Depends(get_session)):
+    """Показать пользователей с заказами"""
+
+    users_with_orders: list[UserModel] = await UserService(session).get_all_with_orders(skip, limit)
+
+    return users_with_orders

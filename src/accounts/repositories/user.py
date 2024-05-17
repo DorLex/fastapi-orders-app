@@ -1,9 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.accounts.models import UserModel
 from src.accounts.schemas import UserCreateSchema
 from src.accounts.utils.auth import get_password_hash
+from src.orders.models import OrderModel
 
 
 class UserRepository:
@@ -29,6 +31,17 @@ class UserRepository:
         query = select(UserModel).offset(skip).limit(limit)
         result = await self._session.scalars(query)
         return result.all()
+
+    async def get_all_with_orders(self, skip: int = 0, limit: int = 100):
+        query = (
+            select(UserModel)
+            .options(joinedload(UserModel.orders))
+            .order_by(UserModel.id)
+            .offset(skip).limit(limit)
+        )
+
+        result = await self._session.scalars(query)
+        return result.unique().all()
 
     async def get_filter_by(self, **filters):
         query = select(UserModel).filter_by(**filters)
