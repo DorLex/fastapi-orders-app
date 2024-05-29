@@ -64,5 +64,4 @@ async def read_orders_with_owner(skip: int = 0, limit: int = 100, session: Async
     """Показать заказы с владельцем"""
 
     orders_with_owner: list[OrderModel] = await OrderService(session).get_all_with_owner(skip, limit)
-
     return orders_with_owner

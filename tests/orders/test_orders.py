@@ -18,6 +18,7 @@ class TestOrdersPositive:
 
     url_orders = main_app.url_path_for('read_orders')
     url_orders_my = main_app.url_path_for('read_my_orders')
+    url_orders_with_owner = main_app.url_path_for('read_orders_with_owner')
 
     async def test_read_orders(self, client: AsyncClient, auth_headers):
         response = await client.get(self.url_orders, headers=auth_headers)
@@ -39,6 +40,12 @@ class TestOrdersPositive:
 
     async def test_read_my_orders(self, client: AsyncClient, auth_headers):
         response = await client.get(self.url_orders_my, headers=auth_headers)
+
+        assert response.status_code == status.HTTP_200_OK, response.text
+        assert len(response.json()) > 0
+
+    async def test_read_orders_with_owner(self, client: AsyncClient, auth_headers):
+        response = await client.get(self.url_orders_with_owner, headers=auth_headers)
 
         assert response.status_code == status.HTTP_200_OK, response.text
         assert len(response.json()) > 0

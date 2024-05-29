@@ -35,5 +35,4 @@ async def read_users_with_orders(skip: int = 0, limit: int = 100, session: Async
     """Показать пользователей с заказами"""
 
     users_with_orders: list[UserModel] = await UserService(session).get_all_with_orders(skip, limit)
-
     return users_with_orders
