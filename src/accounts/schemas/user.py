@@ -1,7 +1,5 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 
-from src.orders.schemas import OrderOutSchema
-
 
 class UserBaseSchema(BaseModel):
     username: str
@@ -32,7 +30,3 @@ class UserOutSchema(UserBaseSchema):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class UserWithOrdersSchema(UserOutSchema):
-    orders: list[OrderOutSchema]

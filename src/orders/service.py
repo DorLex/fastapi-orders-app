@@ -7,7 +7,7 @@ from src.notifications.services.email_notification import EmailNotificationServi
 from src.orders.enums import OrderStatusEnum
 from src.orders.models import OrderModel
 from src.orders.repository import OrderRepository
-from src.orders.schemas import OrderCreateSchema
+from src.orders.schemas.order import OrderCreateSchema
 
 
 class OrderService:
@@ -23,6 +23,9 @@ class OrderService:
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> list[OrderModel]:
         return await self._repository.get_all(skip, limit)
+
+    async def get_all_with_owner(self, skip: int = 0, limit: int = 100) -> list[OrderModel]:
+        return await self._repository.get_all_with_owner(skip, limit)
 
     async def get_by_id(self, order_id: int) -> OrderModel:
         return await self._repository.get_by_id(order_id)

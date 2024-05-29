@@ -7,7 +7,8 @@ from src.accounts.services.auth import get_current_user, verify_token
 from src.dependencies import get_session
 from src.kafka_service.producer.producer import get_producer
 from src.orders.models import OrderModel
-from src.orders.schemas import OrderCreateSchema, OrderOutSchema
+from src.orders.schemas.order import OrderOutSchema, OrderCreateSchema
+from src.orders.schemas.order_with_owner import OrderWithOwnerSchema
 from src.orders.service import OrderService
 
 router = APIRouter(
@@ -56,3 +57,12 @@ async def read_my_orders(
 
     user_orders: list[OrderModel] = await OrderService(session).get_by_user(current_user, skip, limit)
     return user_orders
+
+
+@router.get('/with-owner/', response_model=list[OrderWithOwnerSchema])
+async def read_orders_with_owner(skip: int = 0, limit: int = 100, session: AsyncSession = Depends(get_session)):
+    """Показать заказы с владельцем"""
+
+    orders_with_owner: list[OrderModel] = await OrderService(session).get_all_with_owner(skip, limit)
+
+    return orders_with_owner

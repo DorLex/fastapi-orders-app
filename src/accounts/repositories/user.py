@@ -5,7 +5,6 @@ from sqlalchemy.orm import joinedload
 from src.accounts.models import UserModel
 from src.accounts.schemas import UserCreateSchema
 from src.accounts.utils.auth import get_password_hash
-from src.orders.models import OrderModel
 
 
 class UserRepository:
