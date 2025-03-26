@@ -1,9 +1,12 @@
 import json
+from typing import TypeVar
+
+T = TypeVar('T')
 
 
-def serializer(message):
+def serializer(message: T) -> bytes:
     return json.dumps(message).encode('utf-8')
 
 
-def deserializer(message):
+def deserializer(message: bytes) -> T:
     return json.loads(message.decode('utf-8'))
